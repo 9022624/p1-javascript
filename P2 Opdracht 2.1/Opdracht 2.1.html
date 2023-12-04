@@ -1,37 +1,58 @@
+[13:21] Dylan Mahn
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>P2 Opdracht 2.1 </title>
+    <title>week 2 op3</title>
+</head>
+<body>
+    <div id="movingDiv"></div>
     <style>
         #movingDiv {
             width: 50px;
             height: 50px;
-            background-color: blue;
+            background-color: red;
             position: absolute;
         }
     </style>
-</head>
-<body>
-    <div id="movingDiv"></div>
     <script>
-        function moveDiv() {
-          const movingDiv = document.getElementById('movingDiv');
-          const currentPosition = parseInt(movingDiv.style.left) || 0;
-          const newPosition =  currentPosition + 1;
-          movingDiv.style.left = newPosition + 'px';
-
-
-          const screenWidth = window.innerWidth;
-          if (newPosition + 50 > screenWidth) {
-            clearInterval (intervalId);
-          }
+        const movingDiv = document.getElementById('movingDiv');
+        const screenWidth = window.innerWidth;
+        const divWidth = 50;
+        const speed = 2;
+        let moveRight = true;
+ 
+        //functie om random kleur te genereren
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
         }
-
-
-
-        const intervalId = setInterval(moveDiv, 1);
+ 
+        //functie beweegt met kleur
+        function moveDiv() {
+            const currentPositionX = parseInt(movingDiv.style.left) || 0;
+ 
+            if (currentPositionX < 0 || currentPositionX > screenWidth - divWidth) {
+                moveRight = !moveRight;
+            }
+           
+            const newPositionX = currentPositionX + (moveRight ? speed : -speed);
+            movingDiv.style.left = newPositionX + 'px';
+        }
+ 
+        //event listener reageert
+        movingDiv.addEventListener('click', function() {
+            //verander achtergrond kleur
+            movingDiv.style.backgroundColor = getRandomColor();
+        });
+ 
+        //aan roepen
+        const intervalid = setInterval(moveDiv, 16);
     </script>
 </body>
 </html>
