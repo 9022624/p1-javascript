@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reactietijd Spel</title>
+  <style>
+    body {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    #game-screen {
+      position: relative;
+      width: 100vw;
+      height: 90vh;
+      background-color: red;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+
+<div id="game-screen" onclick="handleClick()">
+    Klik om te starten!
+</div>
+
+<script>
+  let startTime;
+  let endTime;
+  let isGreen = false;
+
+  function startGame() {
+    const gameScreen = document.getElementById('game-screen');
+
+    gameScreen.style.backgroundColor = 'red';
+    gameScreen.innerText = 'Wacht voor groen';
+    isGreen = false;
+
+    setTimeout(() => {
+      gameScreen.style.backgroundColor = 'green';
+      gameScreen.innerText = 'Klik nu!';
+      isGreen = true;
+      startTime = new Date();
+    }, getRandomTime());
+  }
+
+  function handleClick() {
+    if (isGreen) {
+      endTime = new Date();
+      const reactionTime = endTime - startTime;
+
+      // Update de tekst met de reactietijd
+      document.getElementById('game-screen').innerText = `Jou Reactie's tijd : ${reactionTime} milliseconds`;
+
+      // Zet de achtergrondkleur terug naar rood
+      document.getElementById('game-screen').style.backgroundColor = 'red';
+
+      // Wacht een korte tijd voordat je het spel opnieuw start
+      setTimeout(() => {
+        document.getElementById('game-screen').innerText = 'Klik om te starten!';
+        isGreen = false;
+        startGame(); // Start het spel opnieuw
+      }, 1000);
+    } else {
+      startGame(); // Start het spel als er wordt geklikt zonder dat het groen is
+    }
+  }
+
+  function getRandomTime() {
+    return Math.floor(Math.random() * 10000) + 1;
+  }
+</script>
+
+</body>
+</html>
