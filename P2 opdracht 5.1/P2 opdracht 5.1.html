@@ -1,0 +1,65 @@
+<!DOCTYPE html> <!-- Dit geeft aan dat het een HTML5-document is. -->
+<html lang="en"> <!-- Dit geeft de taal van de HTML aan. "en" staat voor Engels. -->
+<head>
+  <meta charset="UTF-8"> <!-- Dit geeft de karaktercodering van het document aan (UTF-8 wordt veel gebruikt). -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Dit stelt de viewport in voor responsiviteit op verschillende apparaten. -->
+  <title>Rock-Paper-Scissors Game</title> <!-- Dit is de titel van het HTML-document die wordt weergegeven in de browsertab. -->
+  <style>
+    img {
+      width: 60px; /* Dit stelt de breedte van alle afbeeldingen in op 100 pixels. */
+      height: auto; /* Dit behoudt de aspectverhouding van de afbeeldingen. */
+    }
+  </style> <!-- Dit is een stijlblad met enkele eenvoudige stijlinstellingen. -->
+</head>
+<body>
+
+<h1>Rock-Paper-Scissors Game</h1> <!-- Dit is een kop (header) die de titel van het spel weergeeft. -->
+
+<!-- Dit zijn drie knoppen met afbeeldingen voor de keuzes in het spel. -->
+<button onclick="makeChoice('rock')">
+  <img src="rock.png" alt="Rock">
+</button>
+
+<button onclick="makeChoice('paper')">
+  <img src="paper.png" alt="Paper">
+</button>
+
+<button onclick="makeChoice('scissors')">
+  <img src="scissors.png" alt="Scissors">
+</button>
+
+<!-- Dit is een sectie (div) waarin de resultaten van het spel worden weergegeven. -->
+<div id="result">
+  <p>Jou keuze: <img id="userChoiceImg" alt=""></p> <!-- Hier wordt de afbeelding van de gebruikerskeuze weergegeven. -->
+  <p>Computer's keuze: <img id="computerChoiceImg" alt=""></p> <!-- Hier wordt de afbeelding van de computeraanwijzing weergegeven. -->
+  <p id="gameResult"></p> <!-- Hier wordt de uitkomst van het spel (wie er wint) weergegeven. -->
+</div>
+
+<!-- Dit is een scriptgedeelte waarin JavaScript-code staat. -->
+<script>
+  function makeChoice(userChoice) { // Dit is de functie die wordt aangeroepen wanneer een knop wordt gekozen.
+    var choices = ['rock', 'paper', 'scissors']; // Dit is een array met de mogelijke keuzes.
+    var computerChoice = choices[Math.floor(Math.random() * choices.length)]; // Dit genereert een willekeurige keuze voor de computer.
+
+    document.getElementById('userChoiceImg').src = userChoice + '.png'; // Dit wijzigt de bron van de afbeelding voor de gebruikerskeuze.
+    document.getElementById('computerChoiceImg').src = computerChoice + '.png'; // Dit wijzigt de bron van de afbeelding voor de computeraanwijzing.
+
+    var result = determineWinner(userChoice, computerChoice); // Dit roept een functie aan om de winnaar te bepalen.
+    document.getElementById('gameResult').innerText = result; // Dit wijzigt de tekst van het resultaat van het spel.
+  }
+
+  function determineWinner(user, computer) { // Dit is de functie die de winnaar van het spel bepaalt.
+    if (user === computer) { // Als de keuzes gelijk zijn, is het gelijkspel.
+      return 'Het is een gelijkspel!';
+    } else if ((user === 'rock' && computer === 'scissors') ||
+               (user === 'paper' && computer === 'rock') ||
+               (user === 'scissors' && computer === 'paper')) { // Als de gebruiker wint op basis van de regels van het spel.
+      return 'Jij wint!';
+    } else { // Anders verliest de gebruiker.
+      return 'Jij verliest!';
+    }
+  }
+</script>
+
+</body>
+</html>
