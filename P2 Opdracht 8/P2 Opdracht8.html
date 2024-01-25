@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bankrekening</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        h1 {
+            color: #333;
+        }
+
+        #saldoDiv {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        #transactieDiv {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input {
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+
+        #geschiedenisDiv {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+<h1>Bankrekening</h1>
+
+<!-- Gebruikerslijst om meerdere accounts bij te houden -->
+<select id="gebruikerslijst" onchange="selecteerGebruiker()">
+    <option value="gebruiker1">Gebruiker 1</option>
+    <option value="gebruiker2">Gebruiker 2</option>
+</select>
+
+<!-- Knop om nieuwe gebruiker aan te maken -->
+<button onclick="maakNieuweGebruiker()">Maak nieuwe gebruiker aan</button>
+
+<div id="saldoDiv">
+    <p>Huidig saldo: <span id="saldo">1.000</span> euro</p>
+</div>
+
+<div id="transactieDiv">
+    <label for="bedrag">Bedrag: </label>
+    <input type="number" id="bedrag" placeholder="Voer bedrag in">
+    <button onclick="controleerSaldo()">Controleer saldo</button>
+    <button onclick="stortGeld()">Stort geld</button>
+    <button onclick="neemGeldOp()">Neem geld op</button>
+</div>
+
+<div id="geschiedenisDiv">
+    <h2>Transactiegeschiedenis</h2>
+    <ul id="transactieGeschiedenis"></ul>
+</div>
+
+<script>
+    // Gebruikersobjecten met hun beginsaldo
+    var gebruikers = {
+        gebruiker1: { saldo: 1000, transactieGeschiedenis: [] },
+        gebruiker2: { saldo: 1500, transactieGeschiedenis: [] }
+    };
+
+    // Huidig geselecteerde gebruiker
+    var huidigeGebruiker = 'gebruiker1';
+
+    // Functie om de gebruikerslijst bij te werken
+    function updateGebruikerslijst() {
+        var gebruikerslijst = document.getElementById('gebruikerslijst');
+        gebruikerslijst.innerHTML = '';
+        for (var gebruiker in gebruikers) {
+            var optie = document.createElement('option');
+            optie.value = gebruiker;
+            optie.textContent = gebruiker.charAt(0).toUpperCase() + gebruiker.slice(1);
+            gebruikerslijst.appendChild(optie);
+        }
+        gebruikerslijst.value = huidigeGebruiker;
+        updateSaldo();
+        updateTransactieGeschiedenis();
+    }
+
+    // Functie om een nieuwe gebruiker aan te maken
+    function maakNieuweGebruiker() {
+        var nieuweGebruiker = prompt("Voer de naam van de nieuwe gebruiker in:");
+        if (nieuweGebruiker && !gebruikers[nieuweGebruiker]) {
+            var initiëleSaldo = parseFloat(prompt("Voer het initiële saldo in voor " + nieuweGebruiker + ":"));
+            if (!isNaN(initiëleSaldo) && initiëleSaldo >= 0) {
+                gebruikers[nieuweGebruiker] = { saldo: initiëleSaldo, transactieGeschiedenis: [] };
+                updateGebruikerslijst();
+            } else {
+                alert("Voer een geldig saldo in (niet-negatief getal).");
+            }
+        } else {
+            alert("Deze gebruiker bestaat al of er is geen geldige naam ingevoerd.");
+        }
+    }
+
+    // Functie om het saldo te formatteren met punt als duizendtallenscheidingsteken
+    function formaatBedrag(bedrag) {
+        return bedrag.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+    }
+
+    // Functie om de geselecteerde gebruiker te wijzigen
+    function selecteerGebruiker() {
+        huidigeGebruiker = document.getElementById('gebruikerslijst').value;
+        updateSaldo();
+        updateTransactieGeschiedenis();
+    }
+
+    // Functie om het saldo te controleren
+    function controleerSaldo() {
+        alert("Huidig saldo: " + formaatBedrag(gebruikers[huidigeGebruiker].saldo) + " euro");
+    }
+
+    // Functie om geld te storten
+    function stortGeld() {
+        var bedrag = parseFloat(document.getElementById("bedrag").value);
+        if (!isNaN(bedrag) && bedrag > 0) {
+            gebruikers[huidigeGebruiker].saldo += bedrag;
+            voegTransactieToe("Storting", bedrag);
+            updateSaldo();
+            alert("Geld gestort. Huidig saldo: " + formaatBedrag(gebruikers[huidigeGebruiker].saldo) + " euro");
+        } else {
+            alert("Voer een geldig bedrag in om te storten.");
+        }
+    }
+
+    // Functie om geld op te nemen
+    function neemGeldOp() {
+        var bedrag = parseFloat(document.getElementById("bedrag").value);
+        if (!isNaN(bedrag) && bedrag > 0) {
+            if (bedrag <= gebruikers[huidigeGebruiker].saldo) {
+                gebruikers[huidigeGebruiker].saldo -= bedrag;
+                voegTransactieToe("Opname", bedrag);
+                updateSaldo();
+                alert("Geld opgenomen. Huidig saldo: " + formaatBedrag(gebruikers[huidigeGebruiker].saldo) + " euro");
+            } else {
+                alert("Onvoldoende saldo om geld op te nemen.");
+            }
+        } else {
+            alert("Voer een geldig bedrag in om op te nemen.");
+        }
+    }
+
+    // Functie om een transactie toe te voegen aan de geschiedenis
+    function voegTransactieToe(type, bedrag) {
+        var datum = new Date().toLocaleString();
+        var transactie = {
+            type: type,
+            bedrag: bedrag,
+            datum: datum
+        };
+        gebruikers[huidigeGebruiker].transactieGeschiedenis.push(transactie);
+        updateTransactieGeschiedenis();
+    }
+
+    // Functie om het saldo bij te werken
+    function updateSaldo() {
+        document.getElementById("saldo").innerText = formaatBedrag(gebruikers[huidigeGebruiker].saldo);
+    }
+
+    // Functie om de transactiegeschiedenis bij te werken
+    function updateTransactieGeschiedenis() {
+        var transactieUl = document.getElementById("transactieGeschiedenis");
+        transactieUl.innerHTML = "";
+        gebruikers[huidigeGebruiker].transactieGeschiedenis.forEach(function(transactie) {
+            var listItem = document.createElement("li");
+            listItem.textContent = transactie.type + ": " + formaatBedrag(transactie.bedrag) + " euro op " + transactie.datum;
+            transactieUl.appendChild(listItem);
+        });
+    }
+
+    // Functie om maandelijkse rente toe te voegen
+    function berekenMaandelijkseRente() {
+        // Hier kun je de rentevoet instellen
+        var rentevoet = 0.01; // 1% rente per maand
+        var maandelijksRente = gebruikers[huidigeGebruiker].saldo * rentevoet;
+        gebruikers[huidigeGebruiker].saldo += maandelijksRente;
+        voegTransactieToe("Rente", maandelijksRente);
+        updateSaldo();
+    }
+    function berekenMaandelijkseRente() {
+        // Hier kun je de rentevoet instellen
+        var rentevoet = 0.01; // 1% rente per maand
+        var vandaag = new Date();
+        
+        // Controleer of het de laatste dag van de maand is
+        if (vandaag.getDate() === new Date(vandaag.getFullYear(), vandaag.getMonth() + 1, 0).getDate()) {
+            var maandelijksRente = gebruikers[huidigeGebruiker].saldo * rentevoet;
+            gebruikers[huidigeGebruiker].saldo += maandelijksRente;
+            voegTransactieToe("Rente", maandelijksRente);
+            updateSaldo();
+        }
+    }
+
+    // Roep de functie aan wanneer de pagina geladen wordt (voorbeeld, je kunt dit aanpassen aan je vereisten)
+    berekenMaandelijkseRente();
+
+    // Roep de functie aan elke dag (voorbeeld, je kunt dit aanpassen aan je vereisten)
+    setInterval(berekenMaandelijkseRente, 24 * 60 * 60 * 1000); // Roep elke dag aan
+
+
+    //Roep de functie aan wanneer de pagina geladen wordt (voorbeeld, je kunt dit aanpassen aan je vereisten)
+    berekenMaandelijkseRente();
+
+    // Roep de functie aan elke maand (voorbeeld, je kunt dit aanpassen aan je vereisten)
+    
+    setInterval(berekenMaandelijkseRente, 30 * 24 * 60 * 60 * 1000); // Roep elke 30 dagen aan
+</script>
+
+</body>
+</html>
